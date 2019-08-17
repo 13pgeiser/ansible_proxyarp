@@ -1,0 +1,51 @@
+---
+
+- name: Install required packages
+  apt:
+    name="{{ pkgs }}"
+    state="present"
+    update_cache=True
+    install_recommends=False
+  vars:
+    pkgs:
+    - iptables
+    - ebtables
+    - bridge-utils
+    - ifupdown
+    - parprouted
+    - dhcp-helper
+    - avahi-daemon
+    - psmisc
+
+- name: Enable IP forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Set interface in dhcp-helper
+  template:
+    src: dhcp-helper.j2
+    dest: /etc/default/dhcp-helper
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Avahi daemon -> reflector & no ipv6
+  template:
+    src: avahi-daemon.conf.j2
+    dest: /etc/avahi/avahi_daemon.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Add proxy ARP interfaces
+  template:
+    src: proxyarp.j2
+    dest: /etc/network/interfaces.d/proxyarp.cfg
+    owner: root
+    group: root
+    mode: 0644
+

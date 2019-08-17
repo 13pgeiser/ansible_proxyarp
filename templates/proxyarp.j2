@@ -1,0 +1,19 @@
+{% for item in proxy_arp.interfaces %}
+auto {{ item }}
+allow-hotplug {{ item }}
+iface {{ item }} inet manual
+
+{% endfor %}
+auto {{ proxy_arp.wlan }}
+allow-hotplug {{ proxy_arp.wlan }}
+iface {{ proxy_arp.wlan }} inet dhcp
+    wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+    post-up /usr/sbin/parprouted {{ proxy_arp.interfaces | join(' ') }} {{ proxy_arp.wlan }}
+    post-down /usr/bin/killall /usr/sbin/parprouted
+    post-up /etc/init.d/dhcp-helper restart
+{% for item in proxy_arp.interfaces %}
+    pre-up /sbin/ifup {{ item }}
+    post-up /sbin/ip addr add $(/sbin/ip addr show {{ proxy_arp.wlan }} | perl -wne 'm|^\s+inet (.*)/| && print $1')/32 dev {{ item }}
+    pre-down /sbin/ip addr del $(/sbin/ip addr show {{ proxy_arp.wlan }} | perl -wne 'm|^\s+inet (.*)/| && print $1')/32 dev {{ item }}
+    post-down /sbin/ifdown {{ item }}
+{% endfor %}
