@@ -5,4 +5,4 @@
 #
 # See "man 8 dhcp-helper" for more details.  
 
-DHCPHELPER_OPTS="-b {{ proxy_arp.wlan }}"
+DHCPHELPER_OPTS="{% for interface in proxy_arp.interfaces %}-i {{interface}}{% endfor %} -b {{ proxy_arp.wlan }}"
