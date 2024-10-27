@@ -13,9 +13,9 @@
     - bridge-utils
     - ifupdown
     - parprouted
-    - dhcp-helper
     - avahi-daemon
     - psmisc
+    - dnsmasq
 
 - name: Enable IP forwarding
   sysctl:
@@ -25,10 +25,18 @@
     state: present
     reload: yes
 
-- name: Set interface in dhcp-helper
+#- name: Set interface in dhcp-helper
+#  template:
+#    src: dhcp-helper.j2
+#    dest: /etc/default/dhcp-helper
+#    owner: root
+#    group: root
+#    mode: 0644
+
+- name: Setup dnsmasq as dhcp
   template:
-    src: dhcp-helper.j2
-    dest: /etc/default/dhcp-helper
+    src: dnsmasq.j2
+    dest: /etc/dnsmasq.d/proxyarp.cfg
     owner: root
     group: root
     mode: 0644
