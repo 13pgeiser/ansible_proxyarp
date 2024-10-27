@@ -3,4 +3,6 @@ interface={% for interface in proxy_arp.interfaces %}{{interface}}{% endfor %}
 bind-interfaces
 domain=home
 dhcp-range=192.168.0.201,192.168.0.221,12h
+no-resolv
+server=192.168.0.254
 
